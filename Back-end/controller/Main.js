@@ -1,7 +1,6 @@
 require('dotenv').config();
 let terminalSession = null;
 const fs = require('fs');
-const http = require('http');
 const https = require('https');
 const repl = require('repl');
 const express = require('express');
@@ -16,12 +15,11 @@ const REPLService = require('../service/REPLService');
 const ErrorResponse = require('../model/response/ErrorResponse');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const codeServer = http.createServer(server);
-const codeServerHttps = https.createServer({
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.cert')
+const codeServer = https.createServer({
+  key: fs.readFileSync(__dirname+'/../../server.key'),
+  cert: fs.readFileSync(__dirname+'/../../server.cert')
 },server);
-const socketCode = require('socket.io')(codeServerHttps);
+const socketCode = require('socket.io')(codeServer);
 
 /**
  * Express middleware
@@ -166,5 +164,4 @@ function killTerminalSession() {
  *
  * @author Osman Cagri GENC
  */
-codeServer.listen(5000);
-codeServerHttps.listen(5443);
+codeServer.listen(8000);
