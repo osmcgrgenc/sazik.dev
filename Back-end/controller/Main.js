@@ -166,5 +166,5 @@ function killTerminalSession() {
  *
  * @author Osman Cagri GENC
  */
-codeServer.listen(8000);
-codeServerHttps.listen(8443);
+codeServer.listen(5000);
+codeServerHttps.listen(5443);
