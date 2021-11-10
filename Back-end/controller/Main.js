@@ -16,8 +16,8 @@ const ErrorResponse = require('../model/response/ErrorResponse');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const codeServer = https.createServer({
-  key: fs.readFileSync(__dirname+'/../../server.key'),
-  cert: fs.readFileSync(__dirname+'/../../server.cert')
+  key: fs.readFileSync(__dirname+'/../../key.pem'),
+  cert: fs.readFileSync(__dirname+'/../../cert.pem')
 },server);
 const socketCode = require('socket.io')(codeServer);
 
