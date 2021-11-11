@@ -1,6 +1,6 @@
 let codeLanguage;
 let selectedLanguage;
-const baseURL = 'http://localhost:5000';
+const baseURL = "https://sazik.dev";
 
 /**
  * Start vue.js on code.html page.
@@ -8,71 +8,81 @@ const baseURL = 'http://localhost:5000';
  * @author Matheus Muriel
  */
 const vueApp = new Vue({
-  el: '#principal',
+  el: "#principal",
   data: {
     inExecution: false,
     isLoged: false,
-    userName: 'Username',
+    userName: "Username",
     languages: [
-      { name: 'Python', value: 'python', img: '/img/python.svg' },
-      { name: 'Javascript', value: 'javascript', img: '/img/javascript.svg' },
-      { name: 'Java', value: 'java', img: '/img/java.svg' },
-      { name: 'NodeJS', value: 'nodejs', img: '/img/nodejs.svg' },
-      { name: 'C', value: 'c', img: '/img/c.svg' },
-      { name: 'C++', value: 'cpp', img: '/img/cpp.svg' },
-      { name: 'C#', value: 'csharp', img: '/img/csharp.svg' }
+      { name: "Python", value: "python", img: "/img/python.svg" },
+      { name: "Javascript", value: "javascript", img: "/img/javascript.svg" },
+      { name: "Java", value: "java", img: "/img/java.svg" },
+      { name: "NodeJS", value: "nodejs", img: "/img/nodejs.svg" },
+      { name: "C", value: "c", img: "/img/c.svg" },
+      { name: "C++", value: "cpp", img: "/img/cpp.svg" },
+      { name: "C#", value: "csharp", img: "/img/csharp.svg" },
     ],
-    selectedLanguage: { name: 'Python', value: 'python', isActive: true, img: '/img/python.svg' },
+    selectedLanguage: {
+      name: "Python",
+      value: "python",
+      isActive: true,
+      img: "/img/python.svg",
+    },
     codeOpened: false,
     userCodes: [],
     terminalObject: undefined,
     resizing: {
       terminal: {
         status: false,
-        coordAux: 0
+        coordAux: 0,
       },
-      lateral: false
+      lateral: false,
     },
     heightTerminal: 200,
     widthLateral: 300,
     screenWidth: window.screen.width,
     screenHeight: window.screen.height,
     pixies: {
-      terminalRowHeightPx: undefined
-    }
+      terminalRowHeightPx: undefined,
+    },
   },
   mounted() {
-    let gerl = document.getElementById('principal');
-    let gutH = document.getElementById('gutterHorizontal');
-    let gutV = document.getElementById('gutterVertical');
+    let gerl = document.getElementById("principal");
+    let gutH = document.getElementById("gutterHorizontal");
+    let gutV = document.getElementById("gutterVertical");
 
-    gutH.addEventListener('mousedown', (e) => {
+    gutH.addEventListener("mousedown", (e) => {
       this.resizing.terminal.status = true;
       this.resizing.terminal.coordAux = e.pageY;
     });
 
-    gutV.addEventListener('mousedown', () => {
+    gutV.addEventListener("mousedown", () => {
       this.resizing.lateral = true;
     });
 
-    gerl.addEventListener('mouseup', () => {
+    gerl.addEventListener("mouseup", () => {
       this.resizing.terminal.status = false;
       this.resizing.lateral = false;
     });
 
-    gerl.addEventListener('mousemove', (e) => {
+    gerl.addEventListener("mousemove", (e) => {
       if (this.resizing.terminal.status) {
-        let blockEdidor = document.getElementById('editorBlock');
+        let blockEdidor = document.getElementById("editorBlock");
 
         let cartesianCoordY = window.screen.height - e.pageY;
 
         this.heightTerminal = cartesianCoordY - blockEdidor.offsetTop;
 
         if (this.pixies.terminalRowHeightPx) {
-          let numberOfPosibleRows = Math.ceil(this.heightTerminal / this.pixies.terminalRowHeightPx);
+          let numberOfPosibleRows = Math.ceil(
+            this.heightTerminal / this.pixies.terminalRowHeightPx
+          );
 
           if (numberOfPosibleRows !== this.terminalObject.rows) {
-            this.terminalObject.resize(this.terminalObject.cols, numberOfPosibleRows);
+            this.terminalObject.resize(
+              this.terminalObject.cols,
+              numberOfPosibleRows
+            );
           }
         }
       }
@@ -85,15 +95,16 @@ const vueApp = new Vue({
   },
   methods: {
     loadInformations() {
-      if (doesHttpOnlyCookieExist('access_token')) {
-        let _isLoged = localStorage.getItem('isLoged');
-        let nickname = localStorage.getItem('nickname');
+      if (doesHttpOnlyCookieExist("access_token")) {
+        let _isLoged = localStorage.getItem("isLoged");
+        let nickname = localStorage.getItem("nickname");
 
         this.isLoged = !!_isLoged;
 
         if (nickname !== null) {
           this.userName = nickname;
         }
+        this.getCodeFiles();
       }
     },
     changeLangSelected(lang) {
@@ -108,28 +119,30 @@ const vueApp = new Vue({
     },
     calculatePixels() {
       // Calcule proportions of terminal size in pixels.
-      let terminalScreen = document.getElementsByClassName('xterm-screen')[0];
+      let terminalScreen = document.getElementsByClassName("xterm-screen")[0];
 
       if (terminalScreen) {
         let numberOfRows = this.terminalObject.rows;
         let heightOfTerminalInPixels = parseInt(this.heightTerminal);
 
-        this.pixies.terminalRowHeightPx = Math.ceil(heightOfTerminalInPixels / numberOfRows);
+        this.pixies.terminalRowHeightPx = Math.ceil(
+          heightOfTerminalInPixels / numberOfRows
+        );
       } else {
-        console.log('Terminal not yet loaded.');
+        console.log("Terminal not yet loaded.");
       }
     },
     loadListOfCodes() {
       $.ajax({
-        url: baseURL + '/usercode/codes/',
-        contentType: 'application/json',
-        type: 'GET'
+        url: baseURL + "/usercode/codes/",
+        contentType: "application/json",
+        type: "GET",
       })
         .done((result) => {
           this.userCodes = result.data;
         })
         .fail((err) => {
-          toastr.error(err.message, 'Error on list codes!');
+          toastr.error(err.message, "Error on list codes!");
         });
     },
     getImgLang(codeLang) {
@@ -137,8 +150,8 @@ const vueApp = new Vue({
     },
     goToCode(codeName) {
       window.location.href = `${baseURL}/code/${codeName}`;
-    }
-  }
+    },
+  },
 });
 
 /**
@@ -147,7 +160,7 @@ const vueApp = new Vue({
  * @author Osman Cagri GENC
  */
 function stopFile() {
-  socket.emit('file-stop');
+  socket.emit("file-stop");
 }
 
 /**
@@ -162,7 +175,7 @@ function executeFile() {
   const fileName = getSelectedNode();
   const codeName = getRoomName();
 
-  socket.emit('file-execute', [language, codeName, fileName]);
+  socket.emit("file-execute", [language, codeName, fileName]);
 }
 
 /**
@@ -193,7 +206,7 @@ function getFileSize() {
  */
 function getTotalLines() {
   const text = codeEditor.getValue();
-  const lines = (text.match(/\n/g) || '').length + 1;
+  const lines = (text.match(/\n/g) || "").length + 1;
 
   return lines;
 }
@@ -214,16 +227,12 @@ function getSelectedLanguage() {
  * @param {*} language
  */
 function setLanguage(language) {
-  let selectedText = $(language)
-    .find('option:selected')
-    .text();
-  let selectedValue = $(language)
-    .find('option:selected')
-    .val();
+  let selectedText = $(language).find("option:selected").text();
+  let selectedValue = $(language).find("option:selected").val();
 
   selectedLanguage = selectedText;
   changeCodeMirrorMode(selectedValue);
-  $('#code-language').text(selectedText);
+  $("#code-language").text(selectedText);
 }
 
 /**
@@ -234,7 +243,7 @@ function setLanguage(language) {
 function setToastrOptions() {
   toastr.options = {
     progressBar: true,
-    closeButton: true
+    closeButton: true,
   };
 }
 
@@ -244,8 +253,8 @@ function setToastrOptions() {
  * @author Osman Cagri GENC
  */
 function openLoginModal() {
-  $('#registerModal').modal('hide');
-  $('#loginModal').modal('show');
+  $("#registerModal").modal("hide");
+  $("#loginModal").modal("show");
 }
 
 /**
@@ -254,8 +263,8 @@ function openLoginModal() {
  * @author Osman Cagri GENC
  */
 function openRegisterModal() {
-  $('#loginModal').modal('hide');
-  $('#registerModal').modal('show');
+  $("#loginModal").modal("hide");
+  $("#registerModal").modal("show");
 }
 
 /**
@@ -265,21 +274,21 @@ function openRegisterModal() {
  */
 function login() {
   $.ajax({
-    url: baseURL + '/users/login/',
-    contentType: 'application/json',
-    type: 'POST',
+    url: baseURL + "/users/login/",
+    contentType: "application/json",
+    type: "POST",
     data: JSON.stringify({
-      Email: $('#emailLogin').val(),
-      Password: $('#passwordLogin').val()
-    })
+      Email: $("#emailLogin").val(),
+      Password: $("#passwordLogin").val(),
+    }),
   })
     .done((result) => {
       getCodeFiles();
-      $('#loginModal').modal('hide');
+      $("#loginModal").modal("hide");
       vueApp.$data.isLoged = true;
-      localStorage.setItem('isLoged', 'true');
-      localStorage.setItem('nickname', result.data.Nickname);
-      localStorage.setItem('email', result.data.Email);
+      localStorage.setItem("isLoged", "true");
+      localStorage.setItem("nickname", result.data.Nickname);
+      localStorage.setItem("email", result.data.Email);
       vueApp.loadInformations();
     })
     .fail(() => {
@@ -294,9 +303,9 @@ function login() {
  */
 function logout() {
   $.ajax({
-    url: baseURL + '/users/logout/',
-    contentType: 'application/json',
-    type: 'DELETE'
+    url: baseURL + "/users/logout/",
+    contentType: "application/json",
+    type: "DELETE",
   })
     .done(() => {
       vueApp.$data.isLoged = false;
@@ -304,7 +313,7 @@ function logout() {
       window.location.reload(false);
     })
     .fail(() => {
-      toastr.error('Error on logout!');
+      toastr.error("Error on logout!");
     });
 }
 
@@ -314,13 +323,13 @@ function logout() {
  * @author Matheus Muriel
  */
 function saveOptions(func) {
-  let codeTheme = $('#editor-theme').val();
+  let codeTheme = $("#editor-theme").val();
 
-  $.getScript('code-mirror.js', () => {
+  $.getScript("code-mirror.js", () => {
     changeTheme(codeTheme);
   })
     .done(() => {
-      $('#optionsModal').modal('hide');
+      $("#optionsModal").modal("hide");
     })
     .fail(() => {
       shakeModal();
@@ -333,13 +342,13 @@ function saveOptions(func) {
  * @author Creative Tim
  */
 function shakeModal() {
-  $('#loginModal .modal-dialog').addClass('shake');
-  $('.error')
-    .addClass('alert alert-danger')
-    .html('Invalid email/password combination');
-  $('input[type="password"]').val('');
+  $("#loginModal .modal-dialog").addClass("shake");
+  $(".error")
+    .addClass("alert alert-danger")
+    .html("Invalid email/password combination");
+  $('input[type="password"]').val("");
   setTimeout(() => {
-    $('#loginModal .modal-dialog').removeClass('shake');
+    $("#loginModal .modal-dialog").removeClass("shake");
   }, 1000);
 }
 
@@ -349,7 +358,7 @@ function shakeModal() {
  * @author Osman Cagri GENC
  */
 function openOptionsModal() {
-  $('#optionsModal').modal('show');
+  $("#optionsModal").modal("show");
 }
 
 /**
@@ -359,15 +368,15 @@ function openOptionsModal() {
  */
 function getCodeLanguage() {
   $.ajax({
-    url: baseURL + '/code/language/' + getRoomName(),
-    contentType: 'application/json',
-    type: 'GET'
+    url: baseURL + "/code/language/" + getRoomName(),
+    contentType: "application/json",
+    type: "GET",
   })
     .done((result) => {
       codeLanguage = result.data.CodeLanguage;
     })
     .fail((err) => {
-      toastr.error(err.responseJSON.message, 'Error to get code language!');
+      toastr.error(err.responseJSON.message, "Error to get code language!");
     });
 }
 
@@ -377,28 +386,28 @@ function getCodeLanguage() {
  * @param {*} params node tree params
  */
 function saveFile($node) {
-  let fileName = $('#new-file-name').val();
+  let fileName = $("#new-file-name").val();
 
-  if (fileName.split('.').length < 2) {
-    toastr.error('Your file need to include pattern - e.g: .js, .py');
+  if (fileName.split(".").length < 2) {
+    toastr.error("Your file need to include pattern - e.g: .js, .py");
     return;
   }
 
   $.ajax({
-    url: baseURL + '/code/file/',
-    contentType: 'application/json',
-    type: 'POST',
+    url: baseURL + "/code/file/",
+    contentType: "application/json",
+    type: "POST",
     data: JSON.stringify({
       CodeName: getRoomName(),
-      FileName: fileName
-    })
+      FileName: fileName,
+    }),
   })
     .done(() => {
       insertNewFileTree($node, fileName);
     })
     .fail((err) => {
-      $('#newFileModal').modal('hide');
-      toastr.error(err.responseJSON.message, 'Error to create file!');
+      $("#newFileModal").modal("hide");
+      toastr.error(err.responseJSON.message, "Error to create file!");
     });
 }
 
@@ -411,21 +420,21 @@ function deleteFile($node) {
   let fileName = $node.text;
 
   $.ajax({
-    url: baseURL + '/code/file/' + getRoomName(),
-    contentType: 'application/json',
-    type: 'DELETE',
+    url: baseURL + "/code/file/" + getRoomName(),
+    contentType: "application/json",
+    type: "DELETE",
     data: JSON.stringify({
-      FileName: fileName
-    })
+      FileName: fileName,
+    }),
   })
     .done(() => {
-      let tree = $('#file-tree');
+      let tree = $("#file-tree");
 
       tree.jstree().delete_node($node);
-      toastr.success('Success to delete file!');
+      toastr.success("Success to delete file!");
     })
     .fail((err) => {
-      toastr.error(err.responseJSON.message, 'Error to delete file!');
+      toastr.error(err.responseJSON.message, "Error to delete file!");
     });
 }
 
@@ -436,20 +445,20 @@ function deleteFile($node) {
  */
 function updateCodeFileContent() {
   $.ajax({
-    url: baseURL + '/code/file/' + getRoomName(),
-    contentType: 'application/json',
-    type: 'PUT',
+    url: baseURL + "/code/file/" + getRoomName(),
+    contentType: "application/json",
+    type: "PUT",
     data: JSON.stringify({
       FileName: getSelectedNode(),
-      FileContent: getEditorText()
-    })
+      FileContent: getEditorText(),
+    }),
   })
     .done((result) => {
       toastr.clear();
-      toastr.success('Success to save file');
+      toastr.success("Success to save file");
     })
     .fail((err) => {
-      toastr.error(err.responseJSON.message, 'Error to update file content!');
+      toastr.error(err.responseJSON.message, "Error to update file content!");
     });
 }
 
@@ -460,9 +469,9 @@ function updateCodeFileContent() {
  */
 function getFileContent(fileName) {
   $.ajax({
-    url: baseURL + '/code/file/' + getRoomName() + '/' + fileName,
-    contentType: 'application/json',
-    type: 'GET'
+    url: baseURL + "/code/file/" + getRoomName() + "/" + fileName,
+    contentType: "application/json",
+    type: "GET",
   })
     .done((result) => {
       if (vueApp.$data.codeOpened) {
@@ -473,7 +482,7 @@ function getFileContent(fileName) {
       }
     })
     .fail((err) => {
-      toastr.error(err.responseJSON.message, 'Error to get file content!');
+      toastr.error(err.responseJSON.message, "Error to get file content!");
     });
 }
 
@@ -483,7 +492,7 @@ function getFileContent(fileName) {
  * @author Osman Cagri GENC
  */
 function openNewFileModal() {
-  $('#newFileModal').modal('show');
+  $("#newFileModal").modal("show");
 }
 
 /**
@@ -492,7 +501,7 @@ function openNewFileModal() {
  * @author Matheus Muriel
  */
 function openNewCodeModal() {
-  $('#newCodeModal').modal('show');
+  $("#newCodeModal").modal("show");
 }
 
 /**
@@ -502,7 +511,7 @@ function openNewCodeModal() {
  */
 function openListCodesModal() {
   vueApp.loadListOfCodes();
-  $('#ListCodeModal').modal('show');
+  $("#ListCodeModal").modal("show");
 }
 
 /**
@@ -511,22 +520,22 @@ function openListCodesModal() {
  * @author Matheus Muriel
  */
 function saveCode() {
-  let codeName = $('#new-code-name').val();
+  let codeName = $("#new-code-name").val();
   let newCodeLanguage = vueApp.$data.selectedLanguage.value;
 
   $.ajax({
-    url: baseURL + '/code/' + codeName + '/' + newCodeLanguage,
-    contentType: 'application/json',
-    type: 'POST'
+    url: baseURL + "/code/" + codeName + "/" + newCodeLanguage,
+    contentType: "application/json",
+    type: "POST",
   })
     .done(() => {
-      $('#newCodeModal').modal('hide');
-      toastr.success('Success to create code!');
-      window.location.href = baseURL + '/code/' + codeName;
+      $("#newCodeModal").modal("hide");
+      toastr.success("Success to create code!");
+      window.location.href = baseURL + "/code/" + codeName;
     })
     .fail((err) => {
-      $('#newCodeModal').modal('hide');
-      toastr.error(err.responseJSON.message, 'Error to create code!');
+      $("#newCodeModal").modal("hide");
+      toastr.error(err.responseJSON.message, "Error to create code!");
     });
 }
 
@@ -536,15 +545,21 @@ function saveCode() {
  * @author Osman Cagri GENC
  */
 function insertNewFileTree($node, fileName) {
-  let fileNameSplit = fileName.split('.');
-  let tree = $('#file-tree');
+  let fileNameSplit = fileName.split(".");
+  let tree = $("#file-tree");
 
-  $node = tree.jstree().create_node($node, { text: fileName, type: 'file', icon: getFileIcon(fileNameSplit[1]) });
+  $node = tree
+    .jstree()
+    .create_node($node, {
+      text: fileName,
+      type: "file",
+      icon: getFileIcon(fileNameSplit[1]),
+    });
   tree.jstree().deselect_all();
   tree.jstree().select_node($node);
-  toastr.success('Success to create file!');
+  toastr.success("Success to create file!");
 
-  $('#newFileModal').modal('hide');
+  $("#newFileModal").modal("hide");
 }
 
 /**
@@ -554,22 +569,22 @@ function insertNewFileTree($node, fileName) {
  */
 function getFileIcon(pattern) {
   switch (pattern) {
-    case 'js':
-      return '/img/javascript.svg';
-    case 'py':
-      return '/img/python.svg';
-    case 'java':
-      return '/img/java.svg';
-    case 'c++':
-      return '/img/cpp.svg';
-    case 'c#':
-      return '/img/csharp.svg';
-    case 'nodejs':
-      return '/img/nodejs.svg';
-    case 'c':
-      return '/img/c.svg';
-    case 'html':
-      return '/img/html.svg';
+    case "js":
+      return "/img/javascript.svg";
+    case "py":
+      return "/img/python.svg";
+    case "java":
+      return "/img/java.svg";
+    case "c++":
+      return "/img/cpp.svg";
+    case "c#":
+      return "/img/csharp.svg";
+    case "nodejs":
+      return "/img/nodejs.svg";
+    case "c":
+      return "/img/c.svg";
+    case "html":
+      return "/img/html.svg";
     default:
       break;
   }
@@ -582,23 +597,23 @@ function getFileIcon(pattern) {
  */
 function registerNewUser() {
   $.ajax({
-    url: baseURL + '/users/',
-    contentType: 'application/json',
-    type: 'POST',
+    url: baseURL + "/users/",
+    contentType: "application/json",
+    type: "POST",
     data: JSON.stringify({
-      Name: $('#nicknameRegister').val(),
-      Email: $('#emailRegister').val(),
-      Password: $('#passwordRegister').val(),
-      Image: ''
-    })
+      Name: $("#nicknameRegister").val(),
+      Email: $("#emailRegister").val(),
+      Password: $("#passwordRegister").val(),
+      Image: "",
+    }),
   })
     .done(() => {
-      $('#registerModal').modal('hide');
-      toastr.success('Success to create user!');
+      $("#registerModal").modal("hide");
+      toastr.success("Success to create user!");
     })
     .fail(() => {
-      $('#registerModal').modal('hide');
-      toastr.error('Error to create user!');
+      $("#registerModal").modal("hide");
+      toastr.error("Error to create user!");
     });
 }
 

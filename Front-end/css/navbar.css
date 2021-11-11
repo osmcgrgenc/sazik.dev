@@ -5,7 +5,6 @@
 
 .navbar .img-logo {
   width: 130px;
-  height: 30px;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -29,11 +28,11 @@
 }
 
 .action-button.run {
-  color: green;
+  color: #cbf078;
 }
 
 .action-button.stop {
-  color: red;
+  color: #e46161;
 }
 
 .dropdown-user > .dropdown-menu {
