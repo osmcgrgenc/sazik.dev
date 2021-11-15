@@ -1,6 +1,6 @@
 let codeLanguage;
 let selectedLanguage;
-const baseURL = "https://sazik.dev";
+const baseURL = "https://localhost:8000";
 
 /**
  * Start vue.js on code.html page.
