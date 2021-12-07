@@ -20,7 +20,8 @@ const codeServer = https.createServer({
   cert: fs.readFileSync(__dirname+'/../../cert.pem')
 },server);
 const socketCode = require('socket.io')(codeServer);
-
+const setupDB = require("../database/init");
+setupDB();
 /**
  * Express middleware
  *

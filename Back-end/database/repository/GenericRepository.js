@@ -7,8 +7,6 @@ module.exports = class GenericRepository {
    * @author Osman Cagri GENC
    */
   static async init() {
-    db();
-
     return this;
   }
 
